@@ -1,0 +1,47 @@
+#! /bin/bash
+
+set -e
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+IMG=$(docker build -q $DIR/.workbench)
+
+if [[ -z $@ ]]; then
+    CMD="bash"
+    WB_INTERACTIVE=true
+else
+    WB_INTERACTIVE=false
+    CMD=$@
+fi
+
+if [[ -f "$DIR/.config" ]]; then
+    . "$DIR/.config"
+else
+    echo "No project config found. Create .config before starting workbench."
+    exit 1
+fi
+
+mkdir -p $DIR/.state/.aws
+touch $DIR/.state/.gitconfig
+cat $DIR/.workbench/templates/aws_config | \
+    sed "s|::aws_access_key_id::|${AWS_ACCESS_KEY_ID}|g" | \
+    sed "s|::aws_secret_access_key::|${AWS_SECRET_ACCESS_KEY}|g" | \
+    sed "s|::aws_default_region::|${AWS_DEFAULT_REGION}|g" | \
+    sed "s|::developer_profile_name::|${DEVELOPER_PROFILE_NAME}|g" | \
+    sed "s|::developer_profile_role::|${DEVELOPER_PROFILE_ROLE}|g" \
+    > $DIR/.state/.aws/config
+
+docker run --rm \
+    -v /etc/passwd:/etc/passwd \
+    -v /etc/group:/etc/group \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v $HOME:$HOME \
+    -v $DIR/.state/.aws:${HOME}/.aws \
+    -v $DIR/.state/.gitconfig:${HOME}/.gitconfig \
+    -w $DIR \
+    -e USER="$USER" \
+    -e WB_INTERACTIVE="$WB_INTERACTIVE" \
+    -e PROJECT_DIR="$DIR" \
+    --net host \
+    --privileged \
+    -it $IMG sudo -u ${USER} -i sh -c "cd $DIR; DEVELOPER_PROFILE_NAME=\"$DEVELOPER_PROFILE_NAME\" AWS_CONFIG_DIR=\"$DIR/.state/.aws\" $CMD"

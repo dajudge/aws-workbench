@@ -1,0 +1,13 @@
+# AWS access key
+AWS_ACCESS_KEY_ID=<< your aws access key id goes here >>
+AWS_SECRET_ACCESS_KEY=<< your aws secret access key goes here >>
+
+# AWS CLI defaults
+AWS_DEFAULT_REGION=eu-central-1
+AWS_DEFAULT_OUTPUT=json
+
+DEVELOPER_PROFILE_NAME=dev
+DEVELOPER_PROFILE_ROLE="<< the role a you'll be working as goes here >>"
+
+GIT_EMAIL=<< your email address goes here >>
+GIT_NAME="<< your name goes here >>"

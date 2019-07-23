@@ -1,0 +1,9 @@
+[profile default]
+region = ::aws_default_region::
+aws_access_key_id = ::aws_access_key_id::
+aws_secret_access_key = ::aws_secret_access_key::
+output = json
+
+[profile ::developer_profile_name::]
+role_arn = ::developer_profile_role::
+source_profile = default
