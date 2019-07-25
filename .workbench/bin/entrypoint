@@ -9,8 +9,4 @@ git config -f /etc/gitconfig user.name "${GIT_NAME}"
 git config -f /etc/gitconfig credential.helper "!aws --profile ${DEVELOPER_PROFILE_NAME} codecommit credential-helper \$@"
 git config -f /etc/gitconfig credential.UseHttpPath true
 
-if [[ "true" == "$WB_INTERACTIVE" ]]; then
-    echo "You are now inside the development workbench."
-fi
-
 exec "$@"

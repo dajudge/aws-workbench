@@ -8,9 +8,7 @@ IMG=$(docker build -q $DIR/.workbench)
 
 if [[ -z $@ ]]; then
     CMD="bash"
-    WB_INTERACTIVE=true
 else
-    WB_INTERACTIVE=false
     CMD=$@
 fi
 
@@ -22,7 +20,10 @@ else
 fi
 
 mkdir -p $DIR/.state/.aws
+mkdir -p $DIR/.state/.docker
 touch $DIR/.state/.gitconfig
+cp ${HOME}/.bashrc $DIR/.state/.bashrc
+cat $DIR/.workbench/.bashrc >> $DIR/.state/.bashrc
 cat $DIR/.workbench/templates/aws_config | \
     sed "s|::aws_access_key_id::|${AWS_ACCESS_KEY_ID}|g" | \
     sed "s|::aws_secret_access_key::|${AWS_SECRET_ACCESS_KEY}|g" | \
@@ -37,11 +38,12 @@ docker run --rm \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v $HOME:$HOME \
     -v $DIR/.state/.aws:${HOME}/.aws \
+    -v $DIR/.state/.docker:${HOME}/.docker \
     -v $DIR/.state/.gitconfig:${HOME}/.gitconfig \
+    -v $DIR/.state/.bashrc:${HOME}/.bashrc \
     -w $DIR \
     -e USER="$USER" \
-    -e WB_INTERACTIVE="$WB_INTERACTIVE" \
     -e PROJECT_DIR="$DIR" \
     --net host \
     --privileged \
-    -it $IMG sudo -u ${USER} -i sh -c "cd $DIR; DEVELOPER_PROFILE_NAME=\"$DEVELOPER_PROFILE_NAME\" AWS_CONFIG_DIR=\"$DIR/.state/.aws\" $CMD"
+    -it $IMG sudo -u ${USER} -i sh -c "cd $DIR; PROJECT_NAME=\"$(basename $DIR)\" DEVELOPER_PROFILE_NAME=\"$DEVELOPER_PROFILE_NAME\" AWS_CONFIG_DIR=\"$DIR/.state/.aws\" $CMD"
