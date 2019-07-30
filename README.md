@@ -1,6 +1,6 @@
 The AWS workbench is set of scripts that makes it trivial to get started with AWS CLI development.
 # Prerequesites
-1. Work with Linux (tested with Ubuntu)
+1. Works with Linux (tested with Ubuntu)
 2. Have docker installed (you are a developer, right?)
 3. Checkout this project somewhere under your home directory (you're not working as root, are you?)
 
@@ -18,7 +18,7 @@ user@host:~/devel/project$
 ```
 
 ## Build the workbench docker image
-This step is optional as it's also begin executed silently when you start the workbench in the 
+This step is optional as it's also being executed silently when you start the workbench in the 
 next step, but it'll take a while and you might want to know what's happening...
 ```
 user@host:~/devel/project$ docker build .workbench
