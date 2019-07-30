@@ -4,7 +4,13 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-IMG=$(docker build -q $DIR/.workbench)
+IMG=$(
+    docker build -q \
+    --build-arg http_proxy="$http_proxy" \
+    --build-arg https_proxy="$https_proxy" \
+    --build-arg no_proxy="$no_proxy" \
+    $DIR/.workbench
+)
 
 if [[ -z $@ ]]; then
     CMD="bash"
@@ -46,4 +52,4 @@ docker run --rm \
     -e PROJECT_DIR="$DIR" \
     --net host \
     --privileged \
-    -it $IMG sudo -u ${USER} -i sh -c "cd $DIR; PROJECT_NAME=\"$(basename $DIR)\" DEVELOPER_PROFILE_NAME=\"$DEVELOPER_PROFILE_NAME\" AWS_CONFIG_DIR=\"$DIR/.state/.aws\" $CMD"
+    -it $IMG sudo -u ${USER} -i sh -c "cd $DIR; http_proxy=\"$http_proxy\" https_proxy=\"$https_proxy\" no_proxy=\"$no_proxy\" PROJECT_NAME=\"$(basename $DIR)\" DEVELOPER_PROFILE_NAME=\"$DEVELOPER_PROFILE_NAME\" AWS_CONFIG_DIR=\"$DIR/.state/.aws\" $CMD"
